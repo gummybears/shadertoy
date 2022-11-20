@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <object class="GtkFileFilter" id="filefilter1">
+    <patterns>
+      <pattern>*.png</pattern>
+      <pattern>*.jpg</pattern>
+    </patterns>
+  </object>
+  <object class="GtkWindow" id="window1">
+    <property name="width_request">800</property>
+    <property name="height_request">600</property>
+    <property name="hexpand">1</property>
+    <property name="vexpand">1</property>
+    <property name="title" translatable="1">Image viewer</property>
+    <child>
+      <placeholder/>
+    </child>
+    <property name="child">
+      <object class="GtkBox" id="box1">
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkScrolledWindow" id="scrolledwindow1">
+            <property name="vexpand">1</property>
+            <property name="focusable">1</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkStatusbar" id="statusbar1">
+            <property name="margin-start">10</property>
+            <property name="margin-end">10</property>
+            <property name="margin_start">10</property>
+            <property name="margin_end">10</property>
+            <property name="margin_top">6</property>
+            <property name="margin_bottom">6</property>
+          </object>
+        </child>
+      </object>
+    </property>
+  </object>
+  <object class="GtkFileChooserDialog" id="filechooserdialog1">
+    <property name="width_request">500</property>
+    <property name="height_request">500</property>
+    <property name="halign">start</property>
+    <property name="valign">baseline</property>
+    <property name="title" translatable="1">Open Image File</property>
+    <property name="resizable">0</property>
+    <property name="modal">1</property>
+    <property name="destroy_with_parent">1</property>
+    <property name="deletable">0</property>
+    <property name="transient_for">window1</property>
+    <property name="create_folders">0</property>
+    <property name="filter">filefilter1</property>
+    <child>
+      <placeholder/>
+    </child>
+  </object>
+</interface>

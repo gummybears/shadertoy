@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <menu id="menubar">
+    <submenu>
+      <attribute name='label' translatable='yes'>_Edit</attribute>
+      <item>
+        <attribute name='label' translatable='yes'>_Copy</attribute>
+        <attribute name='action'>win.copy</attribute>
+      </item>
+      <item>
+        <attribute name='label' translatable='yes'>_Paste</attribute>
+        <attribute name='action'>win.paste</attribute>
+      </item>
+    </submenu>
+  </menu>
+  <object class="GtkApplicationWindow" id="window">
+    <property name="child">
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkScrolledWindow">
+            <child>
+              <object class="GtkTextView">
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow">
+            <child>
+              <object class="GtkTextView">
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </property>
+  </object>
+</interface>

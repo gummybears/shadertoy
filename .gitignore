@@ -1,0 +1,5 @@
+bin/*.*
+bin/
+lib/
+lib/*.*
+a.out
