@@ -51,10 +51,11 @@ require "gtk4"
 #end
 #
 
-def load_menu
-  filename = "menu.ui"
-  builder  = Gtk::Builder.new_from_file("#{__DIR__}/#{filename}")
-  menu     = Gtk::MenuModel.cast builder["menu"]
+def load_menu(app : Gtk::Application)
+  filename   = "menu.ui"
+  builder    = Gtk::Builder.new_from_file("#{__DIR__}/#{filename}")
+  menu_model = Gio::MenuModel.cast builder["app_menu"]
+
 
   # attach the menu to the menu button
   #gtk_menu_button_set_menu_model (GTK_MENU_BUTTON (priv->gears), menu);
@@ -67,7 +68,7 @@ def activate(app : Gtk::Application)
   window.title = "Example Application"
   window.application = app
 
-  load_menu
+  load_menu(app)
 
   window.present
 end
