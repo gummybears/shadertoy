@@ -1,16 +1,15 @@
 require "gtk4"
 
 class ShaderToy
-  #include Enumerable(String)
 
-  property app : Gtk::Application
+  property app    : Gtk::Application
 
   def activate
-    filename    = "window.ui"
-    builder     = Gtk::Builder.new_from_file("#{__DIR__}/#{filename}")
-    window      = Gtk::ApplicationWindow.cast builder["window"]
+    filename = "window.ui"
+    builder  = Gtk::Builder.new_from_file("#{__DIR__}/#{filename}")
+    window   = Gtk::ApplicationWindow.cast builder["window"]
 
-    load_menu(builder)
+    setup_menu(builder,window)
 
     # we could set the title in window.ui
     window.title = "Example Application"
@@ -27,14 +26,7 @@ class ShaderToy
     exit(@app.run)
   end
 
-  def load_file
-  end
-
-
-  def quit_app
-  end
-
-  def load_menu(builder)
+  def setup_menu(builder,window)
 
     filename     = "menu.ui"
     menu_builder = Gtk::Builder.new_from_file("#{__DIR__}/#{filename}")
@@ -46,18 +38,65 @@ class ShaderToy
     button = Gtk::MenuButton.cast builder["gears"]
     button.menu_model = menu_model
 
-    # app_actions = [] of Gio::ActionEntry # = ["load", ->load_file, "quit", -> quit_app]
     #
-    # app_action = Gio::
-    # #app_entries << Gio::ActionEntry.new("quit")
-    # #app_entries =
-    # @app.map_add_action_entries(app_actions)
+    # setup menu actions
+    #
+    action = Gio::SimpleAction.new("quit", nil)
+    @app.add_action(action)
+    action.activate_signal.connect do
+      exit(0)
+    end
 
-    # set accelerator for menuitem "Quit"
+    action = Gio::SimpleAction.new("open_file", nil)
+    @app.add_action(action)
+    action.activate_signal.connect do
+      filechooserdialog(window)
+    end
+
+    #
+    # set accelerator for menuitem "Open" and "Quit"
+    #
     values = ["<Ctrl>Q"]
     @app.set_accels_for_action("app.quit", values)
+
+    values = ["<Ctrl>O"]
+    @app.set_accels_for_action("app.open_file", values)
   end
+
+  def filechooserdialog(window)
+
+    dialog = Gtk::FileChooserDialog.new(application: app, title: "Choose fragment shader file", action: :open)
+    dialog.transient_for = window
+    dialog.add_button("Cancel", Gtk::ResponseType::Cancel.value)
+    dialog.add_button("Open", Gtk::ResponseType::Accept.value)
+
+    #
+    # set the current directory for the file chooser
+    #
+    dialog.current_folder = Gio::File.new_for_path(Dir.current)
+
+    #
+    # add a file filter (later)
+    #
+
+    dialog.response_signal.connect do |response|
+      case Gtk::ResponseType.from_value(response)
+        when .cancel?
+          puts "Cancelled."
+
+        when .accept?
+
+          puts "You choose: #{dialog.file.try(&.path)}"
+
+        else
+      end
+      dialog.destroy
+    end
+    dialog.present
+  end
+
 end
 
 app = ShaderToy.new
 app.run
+

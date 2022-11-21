@@ -3,8 +3,8 @@
   <menu id="app_menu">
     <section>
       <item>
-        <attribute name="label" translatable="yes">_Load</attribute>
-        <attribute name="action">app.preferences</attribute>
+        <attribute name="label" translatable="yes">_Open</attribute>
+        <attribute name="action">app.open_file</attribute>
       </item>
     </section>
     <section>
