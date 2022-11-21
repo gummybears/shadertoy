@@ -65,11 +65,15 @@ class ShaderToy
 
   def filechooserdialog(builder,window)
 
+    textbuffer = Gtk::TextBuffer.cast builder["textbuffer"]
     statusbar  = Gtk::Statusbar.cast(builder["statusbar"])
+    filefilter = Gtk::FileFilter.cast builder["filefilter"]
+
     context_id = statusbar.context_id("statusbar")
     statusbar.push(context_id, "")
 
     dialog = Gtk::FileChooserDialog.new(application: app, title: "Choose fragment shader file", action: :open)
+    dialog.filter        = filefilter
     dialog.transient_for = window
     dialog.add_button("Cancel", Gtk::ResponseType::Cancel.value)
     dialog.add_button("Open", Gtk::ResponseType::Accept.value)
@@ -91,15 +95,26 @@ class ShaderToy
 
         when .accept?
 
-          statusbar.push(context_id, "You choose: #{dialog.file.try(&.path)}")
+          x = dialog.file.try(&.path)
+          if x
+            filename = x.not_nil!
+
+            if File.directory?(filename) == false && File.readable?(filename)
+              lines      = File.read_lines(filename)
+              lines      = lines.join("\n")
+              textbuffer.set_text(lines,lines.size)
+
+              statusbar.push(context_id, "Loaded file #{filename}")
+            end
+          end
 
         else
+
       end
       dialog.destroy
     end
     dialog.present
   end
-
 end
 
 app = ShaderToy.new

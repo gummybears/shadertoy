@@ -43,6 +43,7 @@
               <object class="GtkTextView">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="buffer">textbuffer</property>
               </object>
             </child>
           </object>
