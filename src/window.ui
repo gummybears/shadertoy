@@ -5,7 +5,7 @@
     <patterns>
       <pattern>*.txt</pattern>
       <pattern>*.fs</pattern>
-      <pattern>*.vsx</pattern>
+      <pattern>*.vs</pattern>
     </patterns>
   </object>
   <object class="GtkTextBuffer" id="textbuffer"/>
