@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk" version="4.0"/>
+  <object class="GtkFileFilter" id="filefilter">
+    <patterns>
+      <pattern>*.txt</pattern>
+      <pattern>*.fs</pattern>
+      <pattern>*.vsx</pattern>
+    </patterns>
+  </object>
+  <object class="GtkTextBuffer" id="textbuffer"/>
   <object class="GtkApplicationWindow" id="window">
     <property name="title" translatable="yes">Example Application</property>
     <property name="default-width">600</property>
@@ -26,10 +34,24 @@
       </object>
     </child>
     <child>
-      <object class="GtkBox" id="content_box">
+      <object class="GtkBox" id="box">
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkStack" id="stack"/>
+          <object class="GtkScrolledWindow">
+            <property name="visible">True</property>
+            <child>
+              <object class="GtkTextView">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkStatusbar" id="statusbar">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+          </object>
         </child>
       </object>
     </child>

@@ -2,12 +2,12 @@ require "gtk4"
 
 class ShaderToy
 
-  property app    : Gtk::Application
+  property app : Gtk::Application
 
   def activate
-    filename = "window.ui"
-    builder  = Gtk::Builder.new_from_file("#{__DIR__}/#{filename}")
-    window   = Gtk::ApplicationWindow.cast builder["window"]
+    filename  = "window.ui"
+    builder   = Gtk::Builder.new_from_file("#{__DIR__}/#{filename}")
+    window    = Gtk::ApplicationWindow.cast builder["window"]
 
     setup_menu(builder,window)
 
@@ -50,7 +50,7 @@ class ShaderToy
     action = Gio::SimpleAction.new("open_file", nil)
     @app.add_action(action)
     action.activate_signal.connect do
-      filechooserdialog(window)
+      filechooserdialog(builder,window)
     end
 
     #
@@ -63,7 +63,11 @@ class ShaderToy
     @app.set_accels_for_action("app.open_file", values)
   end
 
-  def filechooserdialog(window)
+  def filechooserdialog(builder,window)
+
+    statusbar  = Gtk::Statusbar.cast(builder["statusbar"])
+    context_id = statusbar.context_id("statusbar")
+    statusbar.push(context_id, "")
 
     dialog = Gtk::FileChooserDialog.new(application: app, title: "Choose fragment shader file", action: :open)
     dialog.transient_for = window
@@ -82,11 +86,12 @@ class ShaderToy
     dialog.response_signal.connect do |response|
       case Gtk::ResponseType.from_value(response)
         when .cancel?
-          puts "Cancelled."
+
+          statusbar.push(context_id, "Cancelled")
 
         when .accept?
 
-          puts "You choose: #{dialog.file.try(&.path)}"
+          statusbar.push(context_id, "You choose: #{dialog.file.try(&.path)}")
 
         else
       end
