@@ -66,7 +66,7 @@ class ShaderToy
   def filechooserdialog(builder,window)
 
     textbuffer = Gtk::TextBuffer.cast builder["textbuffer"]
-    statusbar  = Gtk::Statusbar.cast(builder["statusbar"])
+    statusbar  = Gtk::Statusbar.cast  builder["statusbar"]
     filefilter = Gtk::FileFilter.cast builder["filefilter"]
 
     context_id = statusbar.context_id("statusbar")
@@ -82,11 +82,6 @@ class ShaderToy
     # set the current directory for the file chooser
     #
     dialog.current_folder = Gio::File.new_for_path(Dir.current)
-
-    #
-    # add a file filter (later)
-    #
-
     dialog.response_signal.connect do |response|
       case Gtk::ResponseType.from_value(response)
         when .cancel?
