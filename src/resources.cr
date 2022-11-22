@@ -5,6 +5,11 @@ def menu_ui
   <menu id="app_menu">
     <section>
       <item>
+        <attribute name="label" translatable="yes">_New</attribute>
+        <attribute name="action">app.new_file</attribute>
+      </item>
+
+      <item>
         <attribute name="label" translatable="yes">_Open</attribute>
         <attribute name="action">app.open_file</attribute>
       </item>
@@ -17,6 +22,13 @@ def menu_ui
       <item>
         <attribute name="label" translatable="yes">Save _As...</attribute>
         <attribute name="action">app.save_as</attribute>
+      </item>
+    </section>
+
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">_Compile</attribute>
+        <attribute name="action">app.compile</attribute>
       </item>
     </section>
 
