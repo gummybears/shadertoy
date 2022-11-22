@@ -1,18 +1,20 @@
 require "gtk4"
+require "./resources.cr"
 
 class ShaderToy
 
   property app : Gtk::Application
 
   def activate
-    filename  = "window.ui"
-    builder   = Gtk::Builder.new_from_file("#{__DIR__}/#{filename}")
+    #filename  = "window.ui"
+    #builder   = Gtk::Builder.new_from_file("#{__DIR__}/#{filename}")
+    builder   = Gtk::Builder.new_from_string(window_ui,window_ui.size)
     window    = Gtk::ApplicationWindow.cast builder["window"]
 
     setup_menu(builder,window)
 
     # we could set the title in window.ui
-    window.title = "Example Application"
+    #window.title = "Example Application"
     window.application = app
     window.present
   end
@@ -28,8 +30,9 @@ class ShaderToy
 
   def setup_menu(builder,window)
 
-    filename     = "menu.ui"
-    menu_builder = Gtk::Builder.new_from_file("#{__DIR__}/#{filename}")
+    #filename     = "menu.ui"
+    #menu_builder = Gtk::Builder.new_from_file("#{__DIR__}/#{filename}")
+    menu_builder = Gtk::Builder.new_from_string(menu_ui,menu_ui.size)
     menu_model   = Gio::MenuModel.cast menu_builder["app_menu"]
 
     #
@@ -66,11 +69,11 @@ class ShaderToy
   def filechooserdialog(builder,window)
 
     textbuffer = Gtk::TextBuffer.cast builder["textbuffer"]
-    statusbar  = Gtk::Statusbar.cast  builder["statusbar"]
+    #statusbar  = Gtk::Statusbar.cast  builder["statusbar"]
     filefilter = Gtk::FileFilter.cast builder["filefilter"]
 
-    context_id = statusbar.context_id("statusbar")
-    statusbar.push(context_id, "")
+    # context_id = statusbar.context_id("statusbar")
+    # statusbar.push(context_id, "")
 
     dialog = Gtk::FileChooserDialog.new(application: app, title: "Choose fragment shader file", action: :open)
     dialog.filter        = filefilter
@@ -86,7 +89,7 @@ class ShaderToy
       case Gtk::ResponseType.from_value(response)
         when .cancel?
 
-          statusbar.push(context_id, "Cancelled")
+          # statusbar.push(context_id, "Cancelled")
 
         when .accept?
 
@@ -99,7 +102,7 @@ class ShaderToy
               lines      = lines.join("\n")
               textbuffer.set_text(lines,lines.size)
 
-              statusbar.push(context_id, "Loaded file #{filename}")
+              # statusbar.push(context_id, "Loaded file #{filename}")
             end
           end
 
