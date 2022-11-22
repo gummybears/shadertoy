@@ -117,48 +117,6 @@ class ShaderToy
     #
     setup_menu_accelerators(builder,window)
 
-    # #
-    # # setup menu actions
-    # #
-    # action = Gio::SimpleAction.new("quit", nil)
-    # @app.add_action(action)
-    # action.activate_signal.connect do
-    #   exit(0)
-    # end
-    #
-    # action = Gio::SimpleAction.new("open_file", nil)
-    # @app.add_action(action)
-    # action.activate_signal.connect do
-    #   filechooserdialog(builder,window)
-    # end
-    #
-    # action = Gio::SimpleAction.new("new_file", nil)
-    # @app.add_action(action)
-    # action.activate_signal.connect do
-    #   clear_textbuffer(builder,window)
-    # end
-
-
-    # #
-    # # set accelerator for menuitems "New", "Open", "Save", "Save As" and "Quit"
-    # #
-    # values = ["<Ctrl>N"]
-    # @app.set_accels_for_action("app.new_file", values)
-    #
-    # values = ["<Ctrl>O"]
-    # @app.set_accels_for_action("app.open_file", values)
-    #
-    # values = ["<Ctrl>S"]
-    # @app.set_accels_for_action("app.save", values)
-    #
-    # values = ["<Ctrl>A"]
-    # @app.set_accels_for_action("app.save_as", values)
-    #
-    # values = ["<Ctrl>C"]
-    # @app.set_accels_for_action("app.compile", values)
-    #
-    # values = ["<Ctrl>Q"]
-    # @app.set_accels_for_action("app.quit", values)
   end
 
   #
@@ -183,13 +141,14 @@ class ShaderToy
     lines      = lines.join("\n")
     textbuffer.set_text(lines,lines.size)
 
+    #
+    # update window title
+    #
+    window.title = @title + " | " + filename.to_s
+
   end
 
   def filechooserdialog(builder,window)
-
-    # test code textbuffer = Gtk::TextBuffer.cast builder["textbuffer"]
-    # test code
-    filefilter = Gtk::FileFilter.cast builder["filefilter"]
 
     dialog = Gtk::FileChooserDialog.new(application: app, title: "Choose fragment shader file", action: :open)
 
@@ -228,14 +187,7 @@ class ShaderToy
             if File.directory?(filename) == false && File.readable?(filename)
 
               set_textbuffer(builder,window,filename)
-              # lines      = File.read_lines(filename)
-              # lines      = lines.join("\n")
-              # textbuffer.set_text(lines,lines.size)
 
-              #
-              # update window title
-              #
-              window.title = @title + " | " + filename.to_s
             end
           end
 
