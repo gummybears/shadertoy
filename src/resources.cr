@@ -8,7 +8,18 @@ def menu_ui
         <attribute name="label" translatable="yes">_Open</attribute>
         <attribute name="action">app.open_file</attribute>
       </item>
+
+      <item>
+        <attribute name="label" translatable="yes">_Save</attribute>
+        <attribute name="action">app.save</attribute>
+      </item>
+
+      <item>
+        <attribute name="label" translatable="yes">Save _As...</attribute>
+        <attribute name="action">app.save_as</attribute>
+      </item>
     </section>
+
     <section>
       <item>
         <attribute name="label" translatable="yes">_Quit</attribute>
@@ -58,7 +69,7 @@ def window_ui
       <object class="GtkBox" id="box">
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkScrolledWindow">
+          <object class="GtkScrolledWindow" id="scrolled_window">
             <property name="visible">True</property>
             <child>
               <object class="GtkTextView">

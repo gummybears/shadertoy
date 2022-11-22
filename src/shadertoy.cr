@@ -8,8 +8,14 @@ class ShaderToy
   def activate
     #filename  = "window.ui"
     #builder   = Gtk::Builder.new_from_file("#{__DIR__}/#{filename}")
-    builder   = Gtk::Builder.new_from_string(window_ui,window_ui.size)
-    window    = Gtk::ApplicationWindow.cast builder["window"]
+    builder          = Gtk::Builder.new_from_string(window_ui,window_ui.size)
+    window           = Gtk::ApplicationWindow.cast builder["window"]
+
+    # set natural height
+    scrolled_window  = Gtk::ScrolledWindow.cast builder["scrolled_window"]
+    #scrolled_window.set_size_request(800,640)
+    scrolled_window.propagate_natural_height = true
+    scrolled_window.propagate_natural_width  = true
 
     setup_menu(builder,window)
 
@@ -57,13 +63,21 @@ class ShaderToy
     end
 
     #
-    # set accelerator for menuitem "Open" and "Quit"
+    # set accelerator for menuitems "Open", "Save", "Save As" and "Quit"
     #
-    values = ["<Ctrl>Q"]
-    @app.set_accels_for_action("app.quit", values)
 
     values = ["<Ctrl>O"]
     @app.set_accels_for_action("app.open_file", values)
+
+    values = ["<Ctrl>S"]
+    @app.set_accels_for_action("app.save", values)
+
+    values = ["<Ctrl>A"]
+    @app.set_accels_for_action("app.save_as", values)
+
+    values = ["<Ctrl>Q"]
+    @app.set_accels_for_action("app.quit", values)
+
   end
 
   def filechooserdialog(builder,window)
