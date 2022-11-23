@@ -3,9 +3,8 @@ require "./resources.cr"
 
 class ShaderToy
 
-  property app   : Gtk::Application
-  property title : String = ""
-
+  property app      : Gtk::Application
+  property title    : String = ""
 
   def initialize
     @app = Gtk::Application.new("app.example.com", Gio::ApplicationFlags::None)
@@ -33,17 +32,18 @@ class ShaderToy
 
     #
     # set natural width and height
-    # Note: strange black rectangle appears on the right when resizing application window
+    # Note: sometimes a black rectangle appears on the right when resizing the application window
     #
     scrolled_window = Gtk::ScrolledWindow.cast builder["scrolled_window"]
     scrolled_window.propagate_natural_width  = true
     scrolled_window.propagate_natural_height = true
 
-    # test code scrolled_window.max_content_width  = 1920
-    # test code scrolled_window.max_content_height = 1080
-    # window.on_resize do
-    #   resize_scrolled_window(window)
-    # end
+    #
+    # text view, set hexpand/vexpand to expand to size of scroll window
+    #
+    textview = Gtk::TextView.cast builder["textview"]
+    textview.hexpand = true
+    textview.vexpand = true
 
     setup_menu(builder,window)
 
@@ -51,7 +51,7 @@ class ShaderToy
     window.present
   end
 
-  def setup_menu_actions(builder,window)
+  def setup_menu_actions(builder : Gtk::Builder, window)
 
     action = Gio::SimpleAction.new("quit", nil)
     @app.add_action(action)
@@ -69,13 +69,17 @@ class ShaderToy
     @app.add_action(action)
     action.activate_signal.connect do
       clear_textbuffer(builder,window)
+
+      compile_action = Gio::SimpleAction.new("compile", nil)
+      #compile_action.change_state_signal
+      compile_action.enabled = false
     end
   end
 
   #
   # set accelerator for menuitems "New", "Open", "Save", "Save As" and "Quit"
   #
-  def setup_menu_accelerators(builder,window)
+  def setup_menu_accelerators()
 
     values = ["<Ctrl>N"]
     @app.set_accels_for_action("app.new_file", values)
@@ -96,7 +100,7 @@ class ShaderToy
     @app.set_accels_for_action("app.quit", values)
   end
 
-  def setup_menu(builder,window)
+  def setup_menu(builder : Gtk::Builder, window)
 
     menu_builder = Gtk::Builder.new_from_string(menu_ui,menu_ui.size)
     menu_model   = Gio::MenuModel.cast menu_builder["app_menu"]
@@ -115,7 +119,7 @@ class ShaderToy
     #
     # setup menu accelerators
     #
-    setup_menu_accelerators(builder,window)
+    setup_menu_accelerators()
 
   end
 
@@ -124,7 +128,7 @@ class ShaderToy
   # but only when text buffer has not be changed
   # by user
   #
-  def clear_textbuffer(builder,window)
+  def clear_textbuffer(builder : Gtk::Builder, window)
 
     textbuffer = Gtk::TextBuffer.cast builder["textbuffer"]
 
@@ -133,7 +137,7 @@ class ShaderToy
     textbuffer.set_text(lines,lines.size)
   end
 
-  def set_textbuffer(builder,window,filename)
+  def set_textbuffer(builder : Gtk::Builder, window,filename)
 
     textbuffer = Gtk::TextBuffer.cast builder["textbuffer"]
 
@@ -148,7 +152,7 @@ class ShaderToy
 
   end
 
-  def filechooserdialog(builder,window)
+  def filechooserdialog(builder : Gtk::Builder, window)
 
     dialog = Gtk::FileChooserDialog.new(application: app, title: "Choose fragment shader file", action: :open)
 
@@ -176,17 +180,21 @@ class ShaderToy
     dialog.current_folder = Gio::File.new_for_path(Dir.current)
     dialog.response_signal.connect do |response|
       case Gtk::ResponseType.from_value(response)
-        when .cancel?
 
         when .accept?
 
           x = dialog.file.try(&.path)
           if x
             filename = x.not_nil!
-
             if File.directory?(filename) == false && File.readable?(filename)
 
               set_textbuffer(builder,window,filename)
+
+              action = Gio::SimpleAction.new("compile", nil)
+              @app.add_action(action)
+              action.activate_signal.connect do
+                compile(filename.to_s)
+              end
 
             end
           end
@@ -198,7 +206,8 @@ class ShaderToy
     end
     dialog.present
   end
-end
 
-app = ShaderToy.new
-app.run
+  def compile(filename : String)
+    puts "compile #{filename}"
+  end
+end

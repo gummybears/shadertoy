@@ -84,7 +84,7 @@ def window_ui
           <object class="GtkScrolledWindow" id="scrolled_window">
             <property name="visible">True</property>
             <child>
-              <object class="GtkTextView">
+              <object class="GtkTextView" id="textview">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="buffer">textbuffer</property>

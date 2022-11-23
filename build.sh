@@ -1,3 +1,3 @@
 echo "build shadertoy"
-crystal build src/shadertoy.cr -o shadertoy.out
+crystal build src/main.cr -o shadertoy.out
 
