@@ -86,6 +86,7 @@ class ShaderToy
       compile_action = Gio::SimpleAction.new("compile", nil)
       @app.remove_action("compile")
     end
+
   end
 
   #
@@ -152,7 +153,6 @@ class ShaderToy
   def set_textbuffer(builder : Gtk::Builder, window,filename)
 
     textbuffer = Gtk::TextBuffer.cast builder["textbuffer"]
-
     lines      = File.read_lines(filename)
     lines      = lines.join("\n")
     textbuffer.set_text(lines,lines.size)
@@ -161,12 +161,30 @@ class ShaderToy
     # update window title
     #
     window.title = @title + " | " + filename.to_s
+  end
 
+  def save_file(filename : String, window)
+    #dialog = Gtk::FileChooserDialog.new(application: @app, title: "Save File", action: :save_file)
+    ##dialog.filename = filename
+    #dialog.transient_for = window
+    #dialog.add_button("Cancel", Gtk::ResponseType::Cancel.value)
+    #dialog.add_button("Save",   Gtk::ResponseType::Accept.value)
+    #
+    #dialog.present
+  end
+
+  def save_file_as(window)
+    #dialog = Gtk::FileChooserDialog.new(application: @app, title: "Save File As", action: :save_file_as)
+    #dialog.transient_for = window
+    #dialog.add_button("Cancel", Gtk::ResponseType::Cancel.value)
+    #dialog.add_button("Save",   Gtk::ResponseType::Accept.value)
+    #
+    #dialog.present
   end
 
   def filechooserdialog(builder : Gtk::Builder, window)
 
-    dialog = Gtk::FileChooserDialog.new(application: @app, title: "Choose fragment shader file", action: :open)
+    dialog = Gtk::FileChooserDialog.new(application: @app, title: "Open File", action: :open)
 
     #
     # set file filter
@@ -207,14 +225,15 @@ class ShaderToy
               #
               action = Gio::SimpleAction.new("save", nil)
               @app.add_action(action)
+              #dialog.destroy
               action.activate_signal.connect do
-                save_file(filename)
+                save_file(filename.to_s,window)
               end
 
               action = Gio::SimpleAction.new("save_as", nil)
               @app.add_action(action)
               action.activate_signal.connect do
-                save_file_as()
+                save_file_as(window)
               end
 
               action = Gio::SimpleAction.new("compile", nil)
@@ -229,7 +248,11 @@ class ShaderToy
         else
 
       end
-      dialog.destroy
+
+      if dialog
+        dialog.destroy
+      end
+
     end
     dialog.present
   end
@@ -237,14 +260,5 @@ class ShaderToy
   def compile(filename : String)
     puts "compile #{filename}"
   end
-
-  def save_file(filename)
-    puts "save #{filename}"
-  end
-
-  def save_file_as()
-    puts "save as"
-  end
-
 
 end
