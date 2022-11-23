@@ -3,8 +3,8 @@ require "./resources.cr"
 
 class ShaderToy
 
-  property app      : Gtk::Application
-  property title    : String = ""
+  property app   : Gtk::Application
+  property title : String = ""
 
   def initialize
     @app = Gtk::Application.new("app.example.com", Gio::ApplicationFlags::None)
@@ -47,7 +47,7 @@ class ShaderToy
 
     setup_menu(builder,window)
 
-    window.application = app
+    window.application = @app
     window.present
   end
 
@@ -70,9 +70,21 @@ class ShaderToy
     action.activate_signal.connect do
       clear_textbuffer(builder,window)
 
+      #
+      # disable the following menu actions
+      #
+
+      # disable Save
+      compile_action = Gio::SimpleAction.new("save", nil)
+      @app.remove_action("save")
+
+      # disable Save As
+      compile_action = Gio::SimpleAction.new("save_as", nil)
+      @app.remove_action("save_as")
+
+      # disable Compile
       compile_action = Gio::SimpleAction.new("compile", nil)
-      #compile_action.change_state_signal
-      compile_action.enabled = false
+      @app.remove_action("compile")
     end
   end
 
@@ -154,7 +166,7 @@ class ShaderToy
 
   def filechooserdialog(builder : Gtk::Builder, window)
 
-    dialog = Gtk::FileChooserDialog.new(application: app, title: "Choose fragment shader file", action: :open)
+    dialog = Gtk::FileChooserDialog.new(application: @app, title: "Choose fragment shader file", action: :open)
 
     #
     # set file filter
@@ -190,6 +202,21 @@ class ShaderToy
 
               set_textbuffer(builder,window,filename)
 
+              #
+              # add actions for Save, Save As and Compile
+              #
+              action = Gio::SimpleAction.new("save", nil)
+              @app.add_action(action)
+              action.activate_signal.connect do
+                save_file(filename)
+              end
+
+              action = Gio::SimpleAction.new("save_as", nil)
+              @app.add_action(action)
+              action.activate_signal.connect do
+                save_file_as()
+              end
+
               action = Gio::SimpleAction.new("compile", nil)
               @app.add_action(action)
               action.activate_signal.connect do
@@ -210,4 +237,14 @@ class ShaderToy
   def compile(filename : String)
     puts "compile #{filename}"
   end
+
+  def save_file(filename)
+    puts "save #{filename}"
+  end
+
+  def save_file_as()
+    puts "save as"
+  end
+
+
 end
