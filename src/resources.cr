@@ -19,10 +19,6 @@ def menu_ui
         <attribute name="action">app.save</attribute>
       </item>
 
-      <item>
-        <attribute name="label" translatable="yes">Save _As...</attribute>
-        <attribute name="action">app.save_as</attribute>
-      </item>
     </section>
 
     <section>
@@ -92,12 +88,6 @@ def window_ui
             </child>
           </object>
         </child>
-        <!--child>
-          <object class="GtkStatusbar" id="statusbar">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-          </object>
-        </child-->
       </object>
     </child>
   </object>

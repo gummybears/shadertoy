@@ -5,6 +5,7 @@ class ShaderToy
 
   property app   : Gtk::Application
   property title : String = ""
+  property changed : Bool = false
 
   def initialize
     @app = Gtk::Application.new("app.example.com", Gio::ApplicationFlags::None)
@@ -13,10 +14,6 @@ class ShaderToy
 
   def run
     exit(@app.run)
-  end
-
-  def resize_scrolled_window(window)
-
   end
 
   def activate
@@ -45,6 +42,9 @@ class ShaderToy
     textview.hexpand = true
     textview.vexpand = true
 
+    textbuffer = Gtk::TextBuffer.cast builder["textbuffer"]
+    textbuffer.changed_signal.connect(->textbuffer_changed)
+
     setup_menu(builder,window)
 
     window.application = @app
@@ -62,35 +62,19 @@ class ShaderToy
     action = Gio::SimpleAction.new("open_file", nil)
     @app.add_action(action)
     action.activate_signal.connect do
-      filechooserdialog(builder,window)
+      open_file(builder,window)
     end
 
     action = Gio::SimpleAction.new("new_file", nil)
     @app.add_action(action)
     action.activate_signal.connect do
-      clear_textbuffer(builder,window)
-
-      #
-      # disable the following menu actions
-      #
-
-      # disable Save
-      compile_action = Gio::SimpleAction.new("save", nil)
-      @app.remove_action("save")
-
-      # disable Save As
-      compile_action = Gio::SimpleAction.new("save_as", nil)
-      @app.remove_action("save_as")
-
-      # disable Compile
-      compile_action = Gio::SimpleAction.new("compile", nil)
-      @app.remove_action("compile")
+      new_file(builder,window)
     end
 
   end
 
   #
-  # set accelerator for menuitems "New", "Open", "Save", "Save As" and "Quit"
+  # set accelerator for menuitems "New", "Open", "Save", "Compile" and "Quit"
   #
   def setup_menu_accelerators()
 
@@ -102,9 +86,6 @@ class ShaderToy
 
     values = ["<Ctrl>S"]
     @app.set_accels_for_action("app.save", values)
-
-    values = ["<Ctrl>A"]
-    @app.set_accels_for_action("app.save_as", values)
 
     values = ["<Ctrl>C"]
     @app.set_accels_for_action("app.compile", values)
@@ -141,48 +122,89 @@ class ShaderToy
   # but only when text buffer has not be changed
   # by user
   #
-  def clear_textbuffer(builder : Gtk::Builder, window)
-
+  def clear_textbuffer(builder : Gtk::Builder)
     textbuffer = Gtk::TextBuffer.cast builder["textbuffer"]
-
     lines = [] of String
     lines = lines.join("\n")
     textbuffer.set_text(lines,lines.size)
   end
 
-  def set_textbuffer(builder : Gtk::Builder, window,filename)
-
+  def set_textbuffer(builder : Gtk::Builder, filename)
     textbuffer = Gtk::TextBuffer.cast builder["textbuffer"]
     lines      = File.read_lines(filename)
     lines      = lines.join("\n")
     textbuffer.set_text(lines,lines.size)
-
-    #
-    # update window title
-    #
-    window.title = @title + " | " + filename.to_s
   end
 
-  def save_file(filename : String, window)
-    #dialog = Gtk::FileChooserDialog.new(application: @app, title: "Save File", action: :save_file)
-    ##dialog.filename = filename
-    #dialog.transient_for = window
-    #dialog.add_button("Cancel", Gtk::ResponseType::Cancel.value)
-    #dialog.add_button("Save",   Gtk::ResponseType::Accept.value)
-    #
-    #dialog.present
+  def get_textbuffer(builder : Gtk::Builder) : String
+    textbuffer = Gtk::TextBuffer.cast builder["textbuffer"]
+    text = textbuffer.text
+    return text
   end
 
-  def save_file_as(window)
-    #dialog = Gtk::FileChooserDialog.new(application: @app, title: "Save File As", action: :save_file_as)
-    #dialog.transient_for = window
-    #dialog.add_button("Cancel", Gtk::ResponseType::Cancel.value)
-    #dialog.add_button("Save",   Gtk::ResponseType::Accept.value)
-    #
-    #dialog.present
+  def textbuffer_changed
+    @changed = true
   end
 
-  def filechooserdialog(builder : Gtk::Builder, window)
+  def new_file(builder,window)
+    clear_textbuffer(builder)
+
+    #
+    # disable the following menu actions "Save" and "Compile"
+    #
+    compile_action = Gio::SimpleAction.new("save", nil)
+    @app.remove_action("save")
+
+    compile_action = Gio::SimpleAction.new("compile", nil)
+    @app.remove_action("compile")
+  end
+
+  def save_file(builder,window)
+    dialog = Gtk::FileChooserDialog.new(application: @app, title: "Save File", action: :save)
+    dialog.transient_for = window
+    dialog.add_button("Cancel", Gtk::ResponseType::Cancel.value)
+    dialog.add_button("Save",   Gtk::ResponseType::Accept.value)
+    text = get_textbuffer(builder)
+
+    dialog.response_signal.connect do |response|
+      case Gtk::ResponseType.from_value(response)
+
+        when .accept?
+          #
+          # write text to file
+          #
+          text     = get_textbuffer(builder)
+          filename = get_dialog_filename(dialog)
+          if filename != ""
+
+          end
+
+        else
+
+
+      end
+
+      if dialog
+        dialog.destroy
+      end
+    end
+
+    dialog.present
+  end
+
+  def get_dialog_filename(dialog) : String
+
+    s = ""
+    x = dialog.file.try(&.path)
+    if x
+      filename = x.not_nil!
+      s = filename.to_s
+    end
+
+    return s
+  end
+
+  def open_file(builder : Gtk::Builder, window)
 
     dialog = Gtk::FileChooserDialog.new(application: @app, title: "Open File", action: :open)
 
@@ -213,27 +235,23 @@ class ShaderToy
 
         when .accept?
 
-          x = dialog.file.try(&.path)
-          if x
-            filename = x.not_nil!
+          filename = get_dialog_filename(dialog)
+          if filename != ""
             if File.directory?(filename) == false && File.readable?(filename)
 
-              set_textbuffer(builder,window,filename)
+              set_textbuffer(builder,filename)
+              #
+              # update window title
+              #
+              window.title = @title + " | " + filename
 
               #
-              # add actions for Save, Save As and Compile
+              # add actions for Save and Compile
               #
               action = Gio::SimpleAction.new("save", nil)
               @app.add_action(action)
-              #dialog.destroy
               action.activate_signal.connect do
-                save_file(filename.to_s,window)
-              end
-
-              action = Gio::SimpleAction.new("save_as", nil)
-              @app.add_action(action)
-              action.activate_signal.connect do
-                save_file_as(window)
+                save_file(builder,window)
               end
 
               action = Gio::SimpleAction.new("compile", nil)
